@@ -1,0 +1,121 @@
+.card {
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+  position: relative;
+}
+.card:hover {
+  background: rgba(255,255,255,0.02);
+}
+.card:last-child { border-bottom: none; }
+
+.revenue {
+  border-left: 1px solid rgba(255,255,255,0.15);
+  padding-left: 27px;
+}
+
+.decayMid .title { color: var(--t2); }
+.decayHigh .title { color: var(--t3); }
+
+.main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 24px;
+}
+
+.check {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border-bright);
+  border-radius: 1px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--transition), background var(--transition);
+  padding: 0;
+}
+.check:hover {
+  border-color: var(--white);
+  opacity: 1;
+}
+.check:hover .checkInner {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--white);
+  border-radius: 0;
+}
+.checkInner { display: none; }
+
+.title {
+  flex: 1;
+  font-size: 13px;
+  color: var(--off-white);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: var(--radius);
+  color: var(--dimmer);
+  border: 1px solid var(--border);
+}
+.badge[data-type="revenue"] {
+  color: var(--white);
+  border-color: rgba(255,255,255,0.2);
+}
+.badge[data-type="recurring"] {
+  color: var(--dim);
+}
+.badge[data-type="sales"] {
+  color: #aaa;
+}
+.badge[data-type="decay"] {
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.action {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--dimmer);
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: color var(--transition), border-color var(--transition);
+}
+.action:hover {
+  color: var(--white);
+  border-color: var(--dim);
+  opacity: 1;
+}
+
+.actionDelete:hover {
+  color: var(--dim);
+  border-color: var(--dimmer);
+}
+.actionConfirm {
+  color: var(--dim) !important;
+  border-color: var(--dimmer) !important;
+}

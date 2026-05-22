@@ -1,0 +1,117 @@
+.capture {
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.prompt {
+  color: var(--dimmer);
+  font-size: 16px;
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  font-size: 13px;
+  color: var(--white);
+  letter-spacing: 0.01em;
+}
+
+.addBtn {
+  color: var(--dim);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  flex-shrink: 0;
+  transition: color var(--transition), border-color var(--transition);
+}
+.addBtn:hover {
+  color: var(--white);
+  border-color: var(--dimmer);
+  opacity: 1;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.optionGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.optLabel {
+  color: var(--dimmer);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-size: 11px;
+  padding: 3px 9px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  color: var(--dim);
+  letter-spacing: 0.04em;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+.pill:hover {
+  color: var(--white);
+  border-color: var(--dimmer);
+  opacity: 1;
+}
+.pillActive {
+  color: var(--white) !important;
+  border-color: var(--white) !important;
+  opacity: 1;
+}
+.pillDisabled {
+  opacity: 0.2 !important;
+  cursor: not-allowed;
+}
+
+.recurInput {
+  color: var(--dim);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+}
+.recurNum {
+  width: 36px;
+  text-align: center;
+  color: var(--white);
+  border-bottom: 1px solid var(--border-bright);
+  font-size: 11px;
+  padding: 1px 0;
+}
+
+@media (max-width: 768px) {
+  .capture { padding: 16px 20px; }
+  .options { gap: 16px; }
+}
