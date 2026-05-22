@@ -29,15 +29,50 @@ export async function initDB() {
       last_completed_at TIMESTAMPTZ,
       decay_score INTEGER DEFAULT 0,
       sort_order INTEGER DEFAULT 0,
+      due_date DATE,
       completed BOOLEAN DEFAULT FALSE,
       completed_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS custom_tiers (
+      id SERIAL PRIMARY KEY,
+      label TEXT NOT NULL,
+      sort_order INTEGER DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS custom_tags (
+      id SERIAL PRIMARY KEY,
+      label TEXT NOT NULL,
+      color TEXT NOT NULL DEFAULT '#888888',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS review_sessions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       completed_at TIMESTAMPTZ DEFAULT NOW(),
       tasks_reviewed INTEGER DEFAULT 0
     );
+
+    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE;
+
+    INSERT INTO custom_tiers (label, sort_order)
+    SELECT label, sort_order FROM (VALUES
+      ('do it now', 1),
+      ('do it soon', 2),
+      ('backlog', 3)
+    ) AS v(label, sort_order)
+    WHERE NOT EXISTS (SELECT 1 FROM custom_tiers LIMIT 1);
+
+    INSERT INTO custom_tags (label, color)
+    SELECT label, color FROM (VALUES
+      ('sales', '#c8c8c8'),
+      ('admin', '#888888'),
+      ('personal', '#aaaaaa'),
+      ('revenue', '#ffffff')
+    ) AS v(label, color)
+    WHERE NOT EXISTS (SELECT 1 FROM custom_tags LIMIT 1);
   `)
 }

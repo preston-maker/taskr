@@ -1,0 +1,224 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 60px 24px 0 0;
+}
+
+.panel {
+  width: 360px;
+  background: #0a0a0a;
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 80px);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--white);
+}
+
+.closeBtn {
+  font-size: 18px;
+  color: var(--dimmer);
+  line-height: 1;
+  padding: 0 2px;
+  transition: color var(--transition);
+}
+.closeBtn:hover { color: var(--white); opacity: 1; }
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--dimmer);
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition);
+}
+.tab:hover { color: var(--dim); opacity: 1; }
+.tabActive {
+  color: var(--white) !important;
+  border-bottom-color: var(--white) !important;
+  opacity: 1;
+}
+
+.error {
+  padding: 8px 20px;
+  font-size: 11px;
+  color: #cc4444;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+}
+
+.section {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--dimmer);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+.item:last-child { border-bottom: none; }
+
+.itemNum {
+  font-size: 10px;
+  color: var(--dimmer);
+  letter-spacing: 0.04em;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.colorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.itemLabel {
+  flex: 1;
+  font-size: 12px;
+  color: var(--off-white);
+  letter-spacing: 0.02em;
+}
+
+.deleteBtn {
+  font-size: 10px;
+  color: var(--dimmer);
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: color var(--transition), border-color var(--transition);
+}
+.deleteBtn:hover {
+  color: #cc4444;
+  border-color: rgba(204,68,68,0.3);
+  opacity: 1;
+}
+
+.defaultBadge {
+  font-size: 9px;
+  color: var(--dimmer);
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.addInput {
+  flex: 1;
+  font-size: 12px;
+  color: var(--white);
+  background: none;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  transition: border-color var(--transition);
+}
+.addInput:focus { border-color: var(--dimmer); }
+.addInput::placeholder { color: var(--dimmer); }
+
+.addBtn {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  padding: 6px 12px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  transition: color var(--transition), border-color var(--transition);
+  flex-shrink: 0;
+}
+.addBtn:hover:not(:disabled) {
+  color: var(--white);
+  border-color: var(--dimmer);
+  opacity: 1;
+}
+.addBtn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.colorPicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.colorLabel {
+  font-size: 10px;
+  color: var(--dimmer);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.colorSwatches {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  transition: transform var(--transition), border-color var(--transition);
+  flex-shrink: 0;
+  padding: 0;
+}
+.swatch:hover { transform: scale(1.2); opacity: 1; }
+.swatchActive {
+  border-color: var(--white) !important;
+  transform: scale(1.15);
+}

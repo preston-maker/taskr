@@ -87,6 +87,27 @@
   color: #666;
 }
 
+.due_overdue {
+  color: #cc4444 !important;
+  border-color: rgba(204,68,68,0.3) !important;
+}
+.due_today {
+  color: #dddddd !important;
+  border-color: rgba(255,255,255,0.3) !important;
+}
+.due_soon {
+  color: #999 !important;
+  border-color: rgba(153,153,153,0.25) !important;
+}
+.due_future {
+  color: var(--dimmer) !important;
+}
+
+.overdue {
+  border-left: 1px solid rgba(204,68,68,0.3);
+  padding-left: 27px;
+}
+
 .actions {
   display: flex;
   align-items: center;

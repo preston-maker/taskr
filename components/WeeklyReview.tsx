@@ -5,6 +5,7 @@ import { Task, Tier } from '@/lib/types'
 import styles from './WeeklyReview.module.css'
 
 interface ReviewData {
+  overdue: Task[]
   aging: Task[]
   skipped: Task[]
   drifted: Task[]
@@ -58,6 +59,7 @@ function ReviewItem({
 
 export default function WeeklyReview({ data, onClose, onMove, onDelete }: Props) {
   const sections = [
+    { key: 'overdue', label: 'overdue', tasks: data.overdue, desc: 'past their due date' },
     { key: 'aging', label: 'aging in tier 2', tasks: data.aging, desc: 'sitting too long, decay score elevated' },
     { key: 'skipped', label: 'skipped recurrings', tasks: data.skipped, desc: 'past their recurrence window' },
     { key: 'drifted', label: 'tier drift', tasks: data.drifted, desc: 'not touched in 7+ days' },

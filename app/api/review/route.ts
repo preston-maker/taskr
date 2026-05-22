@@ -3,6 +3,14 @@ import { query } from '@/lib/db'
 
 export async function GET() {
   try {
+    // Overdue tasks
+    const overdue = await query(`
+      SELECT * FROM tasks
+      WHERE completed = FALSE
+        AND due_date < CURRENT_DATE
+      ORDER BY due_date ASC
+    `)
+
     // Tasks aging in Tier 2 (decay_score > 3 or sitting for 7+ days)
     const aging = await query(`
       SELECT * FROM tasks
@@ -43,11 +51,12 @@ export async function GET() {
     `)
 
     return NextResponse.json({
+      overdue: overdue.rows,
       aging: aging.rows,
       skipped: skipped.rows,
       drifted: drifted.rows,
       lastReview: lastReview.rows[0]?.completed_at || null,
-      total: aging.rows.length + skipped.rows.length + drifted.rows.length,
+      total: overdue.rows.length + aging.rows.length + skipped.rows.length + drifted.rows.length,
     })
   } catch (err) {
     console.error(err)

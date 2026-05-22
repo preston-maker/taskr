@@ -41,6 +41,23 @@
   opacity: 1;
 }
 
+.gearBtn {
+  color: var(--dimmer);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  transition: color var(--transition), border-color var(--transition);
+}
+.gearBtn:hover {
+  color: var(--white);
+  border-color: var(--dimmer);
+  opacity: 1;
+}
+
 .main {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

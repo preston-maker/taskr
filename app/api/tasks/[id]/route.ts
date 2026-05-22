@@ -10,7 +10,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const values: unknown[] = []
     let i = 1
 
-    const allowed = ['title', 'tier', 'tag', 'is_revenue', 'is_recurring', 'recur_interval', 'recur_days', 'sort_order', 'completed']
+    const allowed = ['title', 'tier', 'tag', 'is_revenue', 'is_recurring', 'recur_interval', 'recur_days', 'sort_order', 'completed', 'due_date']
     for (const key of allowed) {
       if (key in body) {
         fields.push(`${key} = $${i++}`)

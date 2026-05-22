@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   try {
     await initDB()
     const body = await req.json()
-    const { title, tier = 2, tag = 'admin', is_revenue = false, is_recurring = false, recur_interval, recur_days } = body
+    const { title, tier = 2, tag = 'admin', is_revenue = false, is_recurring = false, recur_interval, recur_days, due_date } = body
 
     const sortResult = await query(
       'SELECT COALESCE(MAX(sort_order), 0) + 1 as next_order FROM tasks WHERE tier = $1 AND completed = FALSE',
@@ -37,9 +37,9 @@ export async function POST(req: Request) {
       : null
 
     const result = await query(
-      `INSERT INTO tasks (title, tier, tag, is_revenue, is_recurring, recur_interval, recur_days, next_recur_at, sort_order)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [title, tier, tag, is_revenue, is_recurring, recur_interval || null, recur_days || null, nextRecurAt, sortOrder]
+      `INSERT INTO tasks (title, tier, tag, is_revenue, is_recurring, recur_interval, recur_days, next_recur_at, sort_order, due_date)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [title, tier, tag, is_revenue, is_recurring, recur_interval || null, recur_days || null, nextRecurAt, sortOrder, due_date || null]
     )
     return NextResponse.json(result.rows[0])
   } catch (err) {

@@ -78,6 +78,9 @@
   color: var(--dim);
   letter-spacing: 0.04em;
   transition: color var(--transition), border-color var(--transition), background var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .pill:hover {
   color: var(--white);
@@ -92,6 +95,13 @@
 .pillDisabled {
   opacity: 0.2 !important;
   cursor: not-allowed;
+}
+
+.tagDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .recurInput {
@@ -110,6 +120,35 @@
   font-size: 11px;
   padding: 1px 0;
 }
+
+.dateInput {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dim);
+  background: none;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 3px 8px;
+  width: auto;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.dateInput:hover, .dateInput:focus {
+  color: var(--white);
+  border-color: var(--dimmer);
+}
+.dateInput::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+  cursor: pointer;
+}
+
+.clearDate {
+  font-size: 13px;
+  color: var(--dimmer);
+  padding: 0 4px;
+  line-height: 1;
+}
+.clearDate:hover { color: var(--white); opacity: 1; }
 
 @media (max-width: 768px) {
   .capture { padding: 16px 20px; }
