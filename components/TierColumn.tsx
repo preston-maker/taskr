@@ -25,7 +25,7 @@ interface Props {
   onDrop: (tier: Tier) => void
 }
 
-const SUBLABELS: Record<number, string> = { 1: 'max 4', 2: 'scores decay daily', 3: 'someday' }
+const SUBLABELS: Record<number, string> = { 1: 'max 4', 2: 'scores decay daily', 3: 'no rush' }
 
 export default function TierColumn({
   tier, label, sortOrder, tasks, completedTasks,

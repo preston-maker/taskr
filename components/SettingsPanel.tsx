@@ -12,6 +12,9 @@ interface Props {
   onTierDeleted: (id: number) => void
   onTagAdded: (tag: CustomTag) => void
   onTagDeleted: (id: number) => void
+  onReview?: () => void
+  onHistory?: () => void
+  isMobile?: boolean
 }
 
 const PRESET_COLORS = [
@@ -20,7 +23,7 @@ const PRESET_COLORS = [
   '#b8a3c8', '#c8c8a3', '#a3c8c8', '#c8b0a3',
 ]
 
-export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTierDeleted, onTagAdded, onTagDeleted }: Props) {
+export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTierDeleted, onTagAdded, onTagDeleted, onReview, onHistory, isMobile }: Props) {
   const [tab, setTab] = useState<'tiers' | 'tags'>('tiers')
   const [newTierLabel, setNewTierLabel] = useState('')
   const [newTagLabel, setNewTagLabel] = useState('')
@@ -114,6 +117,21 @@ export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTie
             tags
           </button>
         </div>
+
+        {isMobile && (onReview || onHistory) && (
+          <div className={styles.mobileActions}>
+            {onHistory && (
+              <button className={styles.mobileAction} onClick={() => { onHistory(); onClose() }}>
+                <span>✓</span> completed history
+              </button>
+            )}
+            {onReview && (
+              <button className={styles.mobileAction} onClick={() => { onReview(); onClose() }}>
+                <span>↻</span> weekly review
+              </button>
+            )}
+          </div>
+        )}
 
         {error && <div className={styles.error}>{error}</div>}
 

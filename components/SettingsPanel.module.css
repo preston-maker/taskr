@@ -222,3 +222,25 @@
   border-color: var(--white) !important;
   transform: scale(1.15);
 }
+
+.mobileActions {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobileAction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  transition: color var(--transition);
+}
+.mobileAction:last-child { border-bottom: none; }
+.mobileAction:hover { color: var(--white); opacity: 1; }
+.mobileAction span { color: var(--dimmer); font-size: 11px; width: 16px; }

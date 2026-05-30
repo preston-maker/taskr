@@ -58,11 +58,13 @@ export async function initDB() {
 
     ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE;
 
+    UPDATE custom_tiers SET label = 'later' WHERE label = 'backlog' AND sort_order = 3;
+
     INSERT INTO custom_tiers (label, sort_order)
     SELECT label, sort_order FROM (VALUES
       ('do it now', 1),
       ('do it soon', 2),
-      ('backlog', 3)
+      ('later', 3)
     ) AS v(label, sort_order)
     WHERE NOT EXISTS (SELECT 1 FROM custom_tiers LIMIT 1);
 

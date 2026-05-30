@@ -211,32 +211,18 @@ export default function TaskrApp() {
         <nav className={styles.mobileNav}>
           {tierColumns.map((col, i) => {
             const count = col.tasks.length
+            const shortLabel = col.sortOrder === 1 ? 'now' : col.sortOrder === 2 ? 'soon' : 'later'
             return (
               <button
                 key={col.tier}
                 className={`${styles.mobileTab} ${activeMobileTier === i ? styles.mobileTabActive : ''}`}
                 onClick={() => setActiveMobileTier(i)}
               >
-                <span className={styles.mobileTabNum}>0{col.sortOrder}</span>
-                <span className={styles.mobileTabLabel}>{col.label}</span>
+                <span className={styles.mobileTabLabel}>{shortLabel}</span>
                 {count > 0 && <span className={styles.mobileTabCount}>{count}</span>}
               </button>
             )
           })}
-          <button
-            className={styles.mobileTab}
-            onClick={() => setHistoryMode(true)}
-          >
-            <span className={styles.mobileTabNum}>✓</span>
-            <span className={styles.mobileTabLabel}>done</span>
-          </button>
-          <button
-            className={styles.mobileTab}
-            onClick={openReview}
-          >
-            <span className={styles.mobileTabNum}>↻</span>
-            <span className={styles.mobileTabLabel}>review</span>
-          </button>
         </nav>
       )}
 
@@ -253,6 +239,9 @@ export default function TaskrApp() {
           onTierDeleted={id => setTiers(prev => prev.filter(t => t.id !== id))}
           onTagAdded={tag => setTags(prev => [...prev, tag])}
           onTagDeleted={id => setTags(prev => prev.filter(t => t.id !== id))}
+          isMobile={isMobile}
+          onReview={openReview}
+          onHistory={() => setHistoryMode(true)}
         />
       )}
     </div>
