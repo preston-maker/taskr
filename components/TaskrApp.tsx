@@ -232,7 +232,6 @@ export default function TaskrApp() {
                 onClick={() => setActiveMobileTier(i)}
               >
                 <span className={styles.mobileTabLabel}>{shortLabel}</span>
-                {count > 0 && <span className={styles.mobileTabCount}>{count}</span>}
               </button>
             )
           })}
