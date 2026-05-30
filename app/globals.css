@@ -29,7 +29,7 @@ html, body {
   background: var(--black);
   color: var(--white);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -42,7 +42,7 @@ html, body {
 
 button {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   border: none;
   background: none;

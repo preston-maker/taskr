@@ -128,7 +128,7 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 16px 4px;
+  padding: 22px 4px;
   color: var(--dim);
   border-right: 1px solid var(--border);
   transition: color var(--transition), background var(--transition);
@@ -152,7 +152,7 @@
 }
 
 .mobileTabLabel {
-  font-size: 12px;
+  font-size: 15px;
   letter-spacing: 0.08em;
   line-height: 1;
   font-weight: 500;
