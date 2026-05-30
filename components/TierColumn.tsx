@@ -25,7 +25,7 @@ interface Props {
   onDrop: (tier: Tier) => void
 }
 
-const SUBLABELS: Record<number, string> = { 1: 'max 4', 2: 'scores decay daily', 3: 'no rush' }
+  const SUBLABELS: Record<number, string> = { 1: 'today', 2: 'this week', 3: 'another day' }
 
 export default function TierColumn({
   tier, label, sortOrder, tasks, completedTasks,
@@ -86,7 +86,7 @@ export default function TierColumn({
         </div>
         <div className={styles.headerActions}>
           <div className={styles.count}>
-            {tasks.length}{cap ? `/${cap}` : ''}
+            {tasks.length}
             {isFull && <span className={styles.full}>full</span>}
           </div>
           <button
