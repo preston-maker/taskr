@@ -34,7 +34,8 @@ export default function TaskrApp() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
-  const [activeMobileTier, setActiveMobileTier] = useState(0) // index into tiers array
+  const [activeMobileTier, setActiveMobileTier] = useState(0)
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
   const [reviewData, setReviewData] = useState<null | {
     overdue: Task[], aging: Task[], skipped: Task[], drifted: Task[], total: number, lastReview: string | null
   }>(null)
@@ -202,18 +203,38 @@ export default function TaskrApp() {
             </>
           )}
           <button className={styles.gearBtn} onClick={() => setSettingsOpen(true)} title="settings">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="7" cy="7" r="2.2"/>
-              <path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.93 2.93l1.06 1.06M10.01 10.01l1.06 1.06M2.93 11.07l1.06-1.06M10.01 3.99l1.06-1.06"/>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
           </button>
           {session?.user && (
-            <button className={styles.avatarBtn} onClick={() => signOut({ callbackUrl: '/login' })} title="sign out">
-              {session.user.image
-                ? <img src={session.user.image} alt="" className={styles.avatarImg} />
-                : <span className={styles.avatarInitial}>{session.user.name?.[0] ?? '?'}</span>
-              }
-            </button>
+            <div className={styles.avatarWrap}>
+              <button
+                className={styles.avatarBtn}
+                onClick={() => setAvatarMenuOpen(v => !v)}
+                title="account"
+              >
+                {session.user.image
+                  ? <img src={session.user.image} alt="" className={styles.avatarImg} />
+                  : <span className={styles.avatarInitial}>{session.user.name?.[0] ?? '?'}</span>
+                }
+              </button>
+              {avatarMenuOpen && (
+                <div className={styles.avatarMenu}>
+                  <div className={styles.avatarMenuUser}>
+                    <span className={styles.avatarMenuName}>{session.user.name}</span>
+                    <span className={styles.avatarMenuEmail}>{session.user.email}</span>
+                  </div>
+                  <button
+                    className={styles.avatarMenuSignOut}
+                    onClick={() => signOut({ callbackUrl: '/login' })}
+                  >
+                    sign out
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </header>
