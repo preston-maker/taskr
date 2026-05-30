@@ -5,9 +5,9 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   try {
     const tag = await query('SELECT label FROM custom_tags WHERE id = $1', [params.id])
     if (!tag.rows[0]) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    const defaults = ['sales', 'admin', 'personal', 'revenue']
-    if (defaults.includes(tag.rows[0].label)) {
-      return NextResponse.json({ error: 'Cannot delete default tags' }, { status: 400 })
+    const count = await query('SELECT COUNT(*) FROM custom_tags')
+    if (parseInt(count.rows[0].count) <= 1) {
+      return NextResponse.json({ error: 'Must have at least one tag' }, { status: 400 })
     }
     await query('DELETE FROM custom_tags WHERE id = $1', [params.id])
     return NextResponse.json({ success: true })

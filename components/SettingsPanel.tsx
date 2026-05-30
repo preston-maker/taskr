@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { CustomTier, CustomTag } from '@/lib/types'
 import styles from './SettingsPanel.module.css'
 
@@ -10,6 +12,7 @@ interface Props {
   onClose: () => void
   onTierAdded: (tier: CustomTier) => void
   onTierDeleted: (id: number) => void
+  onTierUpdated: (tier: CustomTier) => void
   onTagAdded: (tag: CustomTag) => void
   onTagDeleted: (id: number) => void
   onReview?: () => void
@@ -23,77 +26,78 @@ const PRESET_COLORS = [
   '#b8a3c8', '#c8c8a3', '#a3c8c8', '#c8b0a3',
 ]
 
-export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTierDeleted, onTagAdded, onTagDeleted, onReview, onHistory, isMobile }: Props) {
+export default function SettingsPanel({
+  tiers, tags, onClose, onTierAdded, onTierDeleted, onTierUpdated,
+  onTagAdded, onTagDeleted, onReview, onHistory, isMobile
+}: Props) {
   const [tab, setTab] = useState<'tiers' | 'tags'>('tiers')
   const [newTierLabel, setNewTierLabel] = useState('')
   const [newTagLabel, setNewTagLabel] = useState('')
   const [newTagColor, setNewTagColor] = useState('#888888')
+  const [editingTierId, setEditingTierId] = useState<number | null>(null)
+  const [editingTierLabel, setEditingTierLabel] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const { data: session } = useSession()
+
+  const showError = (msg: string) => {
+    setError(msg)
+    setTimeout(() => setError(''), 3000)
+  }
 
   const addTier = async () => {
     if (!newTierLabel.trim()) return
     setSaving(true)
-    setError('')
     const res = await fetch('/api/settings/tiers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ label: newTierLabel.trim() }),
     })
     const data = await res.json()
-    if (res.ok) {
-      onTierAdded(data)
-      setNewTierLabel('')
-    } else {
-      setError(data.error)
-    }
+    if (res.ok) { onTierAdded(data); setNewTierLabel('') }
+    else showError(data.error)
     setSaving(false)
+  }
+
+  const saveTierEdit = async (id: number) => {
+    if (!editingTierLabel.trim()) return
+    const res = await fetch(`/api/settings/tiers/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ label: editingTierLabel.trim() }),
+    })
+    const data = await res.json()
+    if (res.ok) { onTierUpdated(data); setEditingTierId(null) }
+    else showError(data.error)
   }
 
   const deleteTier = async (id: number) => {
     const res = await fetch(`/api/settings/tiers/${id}`, { method: 'DELETE' })
     const data = await res.json()
-    if (res.ok) {
-      onTierDeleted(id)
-    } else {
-      setError(data.error)
-      setTimeout(() => setError(''), 3000)
-    }
+    if (res.ok) onTierDeleted(id)
+    else showError(data.error)
   }
 
   const addTag = async () => {
     if (!newTagLabel.trim()) return
     setSaving(true)
-    setError('')
     const res = await fetch('/api/settings/tags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ label: newTagLabel.trim(), color: newTagColor }),
     })
     const data = await res.json()
-    if (res.ok) {
-      onTagAdded(data)
-      setNewTagLabel('')
-      setNewTagColor('#888888')
-    } else {
-      setError(data.error)
-    }
+    if (res.ok) { onTagAdded(data); setNewTagLabel(''); setNewTagColor('#888888') }
+    else showError(data.error)
     setSaving(false)
   }
 
   const deleteTag = async (id: number) => {
     const res = await fetch(`/api/settings/tags/${id}`, { method: 'DELETE' })
     const data = await res.json()
-    if (res.ok) {
-      onTagDeleted(id)
-    } else {
-      setError(data.error)
-      setTimeout(() => setError(''), 3000)
-    }
+    if (res.ok) onTagDeleted(id)
+    else showError(data.error)
   }
-
-  const defaultTierIds = tiers.filter(t => t.sort_order <= 3).map(t => t.id)
-  const defaultTagLabels = ['sales', 'admin', 'personal', 'revenue']
 
   return (
     <div className={styles.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
@@ -104,18 +108,8 @@ export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTie
         </div>
 
         <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${tab === 'tiers' ? styles.tabActive : ''}`}
-            onClick={() => setTab('tiers')}
-          >
-            tiers
-          </button>
-          <button
-            className={`${styles.tab} ${tab === 'tags' ? styles.tabActive : ''}`}
-            onClick={() => setTab('tags')}
-          >
-            tags
-          </button>
+          <button className={`${styles.tab} ${tab === 'tiers' ? styles.tabActive : ''}`} onClick={() => setTab('tiers')}>tiers</button>
+          <button className={`${styles.tab} ${tab === 'tags' ? styles.tabActive : ''}`} onClick={() => setTab('tags')}>tags</button>
         </div>
 
         {isMobile && (onReview || onHistory) && (
@@ -137,23 +131,40 @@ export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTie
 
         {tab === 'tiers' && (
           <div className={styles.section}>
-            <p className={styles.hint}>default tiers cannot be deleted. custom tiers appear as new columns.</p>
+            <p className={styles.hint}>drag to reorder · click label to edit · must keep at least one tier</p>
             <div className={styles.list}>
               {tiers.map((tier, i) => (
                 <div key={tier.id} className={styles.item}>
                   <span className={styles.itemNum}>0{i + 1}</span>
-                  <span className={styles.itemLabel}>{tier.label}</span>
-                  {!defaultTierIds.includes(tier.id) && (
+                  {editingTierId === tier.id ? (
+                    <input
+                      className={styles.editInput}
+                      value={editingTierLabel}
+                      onChange={e => setEditingTierLabel(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') saveTierEdit(tier.id)
+                        if (e.key === 'Escape') setEditingTierId(null)
+                      }}
+                      autoFocus
+                    />
+                  ) : (
                     <button
-                      className={styles.deleteBtn}
-                      onClick={() => deleteTier(tier.id)}
+                      className={styles.itemLabelBtn}
+                      onClick={() => { setEditingTierId(tier.id); setEditingTierLabel(tier.label) }}
                     >
-                      remove
+                      {tier.label}
                     </button>
                   )}
-                  {defaultTierIds.includes(tier.id) && (
-                    <span className={styles.defaultBadge}>default</span>
-                  )}
+                  <div className={styles.itemActions}>
+                    {editingTierId === tier.id ? (
+                      <>
+                        <button className={styles.saveBtn2} onClick={() => saveTierEdit(tier.id)}>save</button>
+                        <button className={styles.cancelBtn2} onClick={() => setEditingTierId(null)}>×</button>
+                      </>
+                    ) : (
+                      <button className={styles.deleteBtn} onClick={() => deleteTier(tier.id)}>remove</button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -165,36 +176,20 @@ export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTie
                 onChange={e => setNewTierLabel(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addTier()}
               />
-              <button
-                className={styles.addBtn}
-                onClick={addTier}
-                disabled={!newTierLabel.trim() || saving}
-              >
-                add
-              </button>
+              <button className={styles.addBtn} onClick={addTier} disabled={!newTierLabel.trim() || saving}>add</button>
             </div>
           </div>
         )}
 
         {tab === 'tags' && (
           <div className={styles.section}>
-            <p className={styles.hint}>default tags cannot be deleted. tags appear in quick capture and on task cards.</p>
+            <p className={styles.hint}>must keep at least one tag</p>
             <div className={styles.list}>
               {tags.map(tag => (
                 <div key={tag.id} className={styles.item}>
                   <span className={styles.colorDot} style={{ background: tag.color }} />
                   <span className={styles.itemLabel}>{tag.label}</span>
-                  {!defaultTagLabels.includes(tag.label) && (
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => deleteTag(tag.id)}
-                    >
-                      remove
-                    </button>
-                  )}
-                  {defaultTagLabels.includes(tag.label) && (
-                    <span className={styles.defaultBadge}>default</span>
-                  )}
+                  <button className={styles.deleteBtn} onClick={() => deleteTag(tag.id)}>remove</button>
                 </div>
               ))}
             </div>
@@ -206,13 +201,7 @@ export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTie
                 onChange={e => setNewTagLabel(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && newTagLabel.trim() && addTag()}
               />
-              <button
-                className={styles.addBtn}
-                onClick={addTag}
-                disabled={!newTagLabel.trim() || saving}
-              >
-                add
-              </button>
+              <button className={styles.addBtn} onClick={addTag} disabled={!newTagLabel.trim() || saving}>add</button>
             </div>
             <div className={styles.colorPicker}>
               <span className={styles.colorLabel}>color</span>
@@ -229,6 +218,22 @@ export default function SettingsPanel({ tiers, tags, onClose, onTierAdded, onTie
             </div>
           </div>
         )}
+
+        {/* Account / sign out */}
+        <div className={styles.account}>
+          {session?.user && (
+            <div className={styles.accountUser}>
+              {session.user.image && <img src={session.user.image} className={styles.accountAvatar} alt="" />}
+              <div className={styles.accountInfo}>
+                <span className={styles.accountName}>{session.user.name}</span>
+                <span className={styles.accountEmail}>{session.user.email}</span>
+              </div>
+            </div>
+          )}
+          <button className={styles.signOutBtn} onClick={() => signOut({ callbackUrl: '/login' })}>
+            sign out
+          </button>
+        </div>
       </div>
     </div>
   )

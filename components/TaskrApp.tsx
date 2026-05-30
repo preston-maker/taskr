@@ -253,6 +253,7 @@ export default function TaskrApp() {
           onClose={() => setSettingsOpen(false)}
           onTierAdded={tier => setTiers(prev => [...prev, tier])}
           onTierDeleted={id => setTiers(prev => prev.filter(t => t.id !== id))}
+          onTierUpdated={tier => setTiers(prev => prev.map(t => t.id === tier.id ? tier : t))}
           onTagAdded={tag => setTags(prev => [...prev, tag])}
           onTagDeleted={id => setTags(prev => prev.filter(t => t.id !== id))}
           isMobile={isMobile}
