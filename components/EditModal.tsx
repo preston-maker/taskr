@@ -26,6 +26,7 @@ export default function EditModal({ task, tiers, tags, onSave, onClose }: Props)
   const [isRecurring, setIsRecurring] = useState(task.is_recurring)
   const [recurDays, setRecurDays] = useState(task.recur_days ?? 7)
   const [dueDate, setDueDate] = useState(task.due_date ? task.due_date.split('T')[0] : '')
+  const [notes, setNotes] = useState(task.notes ?? '')
   const [saving, setSaving] = useState(false)
 
   const handleSave = async () => {
@@ -39,6 +40,7 @@ export default function EditModal({ task, tiers, tags, onSave, onClose }: Props)
       is_recurring: isRecurring,
       recur_days: isRecurring ? recurDays : undefined,
       due_date: dueDate || undefined,
+      notes: notes || undefined,
     })
     onClose()
   }
@@ -110,6 +112,17 @@ export default function EditModal({ task, tiers, tags, onSave, onClose }: Props)
                 <button className={styles.clearBtn} onClick={() => setDueDate('')}>clear</button>
               )}
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>notes</label>
+            <textarea
+              className={styles.notesInput}
+              placeholder="add context, links, details..."
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              rows={3}
+            />
           </div>
 
           <div className={styles.field}>

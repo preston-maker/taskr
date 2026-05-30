@@ -183,3 +183,20 @@
 }
 .saveBtn:hover:not(:disabled) { opacity: 0.85; }
 .saveBtn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.notesInput {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--off-white);
+  background: none;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  width: 100%;
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color var(--transition);
+  min-height: 72px;
+}
+.notesInput:focus { border-color: var(--dimmer); outline: none; }
+.notesInput::placeholder { color: var(--dimmer); }

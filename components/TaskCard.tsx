@@ -67,6 +67,7 @@ export default function TaskCard({ task, tier, onComplete, onMove, onDelete, onE
           )}
           {task.is_revenue && <span className={styles.badge} data-type="revenue">$</span>}
           {task.is_recurring && <span className={styles.badge} data-type="recurring">↻</span>}
+          {task.notes && <span className={styles.badge} data-type="notes" title={task.notes}>✎</span>}
           <span className={styles.badge} style={{ color: tagColor, borderColor: `${tagColor}33` }}>
             {task.tag}
           </span>

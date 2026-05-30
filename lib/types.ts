@@ -15,6 +15,7 @@ export interface Task {
   decay_score: number
   sort_order: number
   due_date?: string
+  notes?: string
   completed: boolean
   completed_at?: string
   created_at: string

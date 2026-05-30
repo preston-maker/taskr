@@ -40,7 +40,7 @@ export default function TierColumn({
   const [isDragOver, setIsDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const isFull = cap !== undefined && tasks.length >= cap
+  const isFull = false // cap removed
   const sublabel = SUBLABELS[sortOrder] || ''
   const tierNum = String(sortOrder).padStart(2, '0')
 
@@ -55,7 +55,8 @@ export default function TierColumn({
     onAdd(inlineTitle.trim(), inlineTag, inlineRevenue)
     setInlineTitle('')
     setInlineRevenue(false)
-    setShowInlineAdd(false)
+    // Keep inline add open so user can keep adding
+    setTimeout(() => inputRef.current?.focus(), 50)
   }
 
   const handleDragOver = (e: React.DragEvent) => {

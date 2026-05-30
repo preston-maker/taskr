@@ -9,6 +9,7 @@ import WeeklyReview from './WeeklyReview'
 import SettingsPanel from './SettingsPanel'
 import EditModal from './EditModal'
 import CompletedHistory from './CompletedHistory'
+import NotificationPrompt from './NotificationPrompt'
 import styles from './TaskrApp.module.css'
 
 function useIsMobile() {
@@ -65,6 +66,27 @@ export default function TaskrApp() {
   useEffect(() => {
     Promise.all([fetchTasks(), fetchSettings()]).then(() => setLoading(false))
   }, [fetchTasks, fetchSettings])
+
+  // Fire notification for due/overdue tasks once loaded
+  useEffect(() => {
+    if (!tasks.length) return
+    if (typeof window === 'undefined' || Notification.permission !== 'granted') return
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const due = tasks.filter(t => {
+      if (!t.due_date) return false
+      const d = new Date(t.due_date)
+      d.setHours(0, 0, 0, 0)
+      return d <= today
+    })
+    if (due.length > 0) {
+      new Notification('taskr', {
+        body: `${due.length} task${due.length > 1 ? 's' : ''} due today or overdue.`,
+        icon: '/icon-192.png',
+        tag: 'taskr-due',
+      })
+    }
+  }, [tasks.length])
 
   const addTask = async (title: string, tier: Tier, tag: Tag, isRevenue: boolean, isRecurring: boolean, recurDays?: number, dueDate?: string) => {
     const res = await fetch('/api/tasks', {
@@ -159,7 +181,7 @@ export default function TaskrApp() {
     sortOrder: t.sort_order,
     tasks: tasks.filter(task => task.tier === t.id),
     completed: completedTasks.filter(task => task.tier === t.id),
-    cap: t.sort_order === 1 ? 4 : undefined,
+    cap: undefined,
   }))
 
   const tier1Full = (tierColumns[0]?.tasks.length ?? 0) >= 4
@@ -245,6 +267,8 @@ export default function TaskrApp() {
       {editingTask && (
         <EditModal task={editingTask} tiers={tiers} tags={tags} onSave={updateTask} onClose={() => setEditingTask(null)} />
       )}
+
+      <NotificationPrompt />
 
       {settingsOpen && (
         <SettingsPanel

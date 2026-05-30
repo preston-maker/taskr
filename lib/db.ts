@@ -69,6 +69,7 @@ export async function initDB() {
 
     ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE;
     ALTER TABLE tasks ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE CASCADE;
+    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS notes TEXT;
 
     UPDATE custom_tiers SET label = 'later' WHERE label = 'backlog' AND sort_order = 3;
 

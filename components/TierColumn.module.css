@@ -86,19 +86,19 @@
 
 .addColBtn {
   font-size: 14px;
-  color: var(--dimmer);
+  color: var(--white);
   width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border);
+  border: 1px solid var(--dimmer);
   border-radius: var(--radius);
   line-height: 1;
   padding: 0;
-  transition: color var(--transition), border-color var(--transition);
+  transition: opacity var(--transition);
 }
-.addColBtn:hover { color: var(--white); border-color: var(--dimmer); opacity: 1; }
+.addColBtn:hover { opacity: 0.6; }
 
 .dragOver {
   background: rgba(255,255,255,0.02);
