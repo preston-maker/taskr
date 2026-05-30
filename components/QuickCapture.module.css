@@ -154,3 +154,17 @@
   .capture { padding: 16px 20px; }
   .options { gap: 16px; }
 }
+
+@media (max-width: 768px) {
+  .capture {
+    padding: 14px 16px;
+  }
+  .options {
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .optionGroup {
+    flex-wrap: wrap;
+  }
+}

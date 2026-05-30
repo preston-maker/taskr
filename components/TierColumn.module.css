@@ -221,3 +221,17 @@
   text-decoration-color: var(--border-bright);
   letter-spacing: 0.01em;
 }
+
+@media (max-width: 768px) {
+  .column {
+    border-right: none;
+    min-height: auto;
+  }
+  .header {
+    padding: 16px 16px 12px;
+    align-items: center;
+  }
+  .tasks {
+    padding: 8px 0;
+  }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Task, Tier, Tag, CustomTier, CustomTag } from '@/lib/types'
 import TierColumn from './TierColumn'
 import QuickCapture from './QuickCapture'
@@ -9,6 +9,17 @@ import SettingsPanel from './SettingsPanel'
 import EditModal from './EditModal'
 import CompletedHistory from './CompletedHistory'
 import styles from './TaskrApp.module.css'
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
 
 export default function TaskrApp() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -21,9 +32,11 @@ export default function TaskrApp() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
+  const [activeMobileTier, setActiveMobileTier] = useState(0) // index into tiers array
   const [reviewData, setReviewData] = useState<null | {
     overdue: Task[], aging: Task[], skipped: Task[], drifted: Task[], total: number, lastReview: string | null
   }>(null)
+  const isMobile = useIsMobile()
 
   const fetchTasks = useCallback(async () => {
     const [activeRes, completedRes] = await Promise.all([
@@ -111,7 +124,6 @@ export default function TaskrApp() {
     fetchTasks()
   }
 
-  // Drag handlers
   const handleDragStart = (id: string) => setDragId(id)
   const handleDragEnd = () => setDragId(null)
   const handleDropOnTier = async (tierId: Tier) => {
@@ -128,20 +140,11 @@ export default function TaskrApp() {
   }
 
   if (reviewMode && reviewData) {
-    return (
-      <WeeklyReview data={reviewData} onClose={closeReview} onMove={moveTask} onDelete={deleteTask} onRefresh={fetchTasks} />
-    )
+    return <WeeklyReview data={reviewData} onClose={closeReview} onMove={moveTask} onDelete={deleteTask} onRefresh={fetchTasks} />
   }
 
   if (historyMode) {
-    return (
-      <CompletedHistory
-        tiers={tiers}
-        tags={tags}
-        onClose={() => setHistoryMode(false)}
-        onRestore={restoreTask}
-      />
-    )
+    return <CompletedHistory tiers={tiers} tags={tags} onClose={() => setHistoryMode(false)} onRestore={restoreTask} />
   }
 
   const tierColumns = tiers.map(t => ({
@@ -154,14 +157,19 @@ export default function TaskrApp() {
   }))
 
   const tier1Full = (tierColumns[0]?.tasks.length ?? 0) >= 4
+  const visibleColumns = isMobile ? [tierColumns[activeMobileTier]] : tierColumns
 
   return (
-    <div className={styles.app}>
+    <div className={`${styles.app} ${isMobile ? styles.appMobile : ''}`}>
       <header className={styles.header}>
         <div className={styles.wordmark}>taskr</div>
         <div className={styles.headerRight}>
-          <button className={styles.historyBtn} onClick={() => setHistoryMode(true)}>completed</button>
-          <button className={styles.reviewBtn} onClick={openReview}>weekly review</button>
+          {!isMobile && (
+            <>
+              <button className={styles.historyBtn} onClick={() => setHistoryMode(true)}>completed</button>
+              <button className={styles.reviewBtn} onClick={openReview}>weekly review</button>
+            </>
+          )}
           <button className={styles.gearBtn} onClick={() => setSettingsOpen(true)} title="settings">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="7" cy="7" r="2.2"/>
@@ -173,21 +181,21 @@ export default function TaskrApp() {
 
       <QuickCapture onAdd={addTask} tier1Full={tier1Full} tiers={tiers} tags={tags} />
 
-      <main className={styles.main} style={{ gridTemplateColumns: `repeat(${tierColumns.length}, 1fr)` }}>
-        {tierColumns.map(col => (
+      <main className={styles.main} style={!isMobile ? { gridTemplateColumns: `repeat(${tierColumns.length}, 1fr)` } : undefined}>
+        {visibleColumns.filter(Boolean).map(col => (
           <TierColumn
-            key={col.tier}
-            tier={col.tier}
-            label={col.label}
-            sortOrder={col.sortOrder}
-            tasks={col.tasks}
-            completedTasks={col.completed}
+            key={col!.tier}
+            tier={col!.tier}
+            label={col!.label}
+            sortOrder={col!.sortOrder}
+            tasks={col!.tasks}
+            completedTasks={col!.completed}
             onComplete={completeTask}
             onMove={moveTask}
             onDelete={deleteTask}
             onEdit={setEditingTask}
-            onAdd={(title, tag, isRevenue) => addTask(title, col.tier, tag, isRevenue, false)}
-            cap={col.cap}
+            onAdd={(title, tag, isRevenue) => addTask(title, col!.tier, tag, isRevenue, false)}
+            cap={col!.cap}
             allTiers={tiers}
             tags={tags}
             dragId={dragId}
@@ -198,14 +206,42 @@ export default function TaskrApp() {
         ))}
       </main>
 
+      {/* Mobile bottom tab bar */}
+      {isMobile && (
+        <nav className={styles.mobileNav}>
+          {tierColumns.map((col, i) => {
+            const count = col.tasks.length
+            return (
+              <button
+                key={col.tier}
+                className={`${styles.mobileTab} ${activeMobileTier === i ? styles.mobileTabActive : ''}`}
+                onClick={() => setActiveMobileTier(i)}
+              >
+                <span className={styles.mobileTabNum}>0{col.sortOrder}</span>
+                <span className={styles.mobileTabLabel}>{col.label}</span>
+                {count > 0 && <span className={styles.mobileTabCount}>{count}</span>}
+              </button>
+            )
+          })}
+          <button
+            className={styles.mobileTab}
+            onClick={() => setHistoryMode(true)}
+          >
+            <span className={styles.mobileTabNum}>✓</span>
+            <span className={styles.mobileTabLabel}>done</span>
+          </button>
+          <button
+            className={styles.mobileTab}
+            onClick={openReview}
+          >
+            <span className={styles.mobileTabNum}>↻</span>
+            <span className={styles.mobileTabLabel}>review</span>
+          </button>
+        </nav>
+      )}
+
       {editingTask && (
-        <EditModal
-          task={editingTask}
-          tiers={tiers}
-          tags={tags}
-          onSave={updateTask}
-          onClose={() => setEditingTask(null)}
-        />
+        <EditModal task={editingTask} tiers={tiers} tags={tags} onSave={updateTask} onClose={() => setEditingTask(null)} />
       )}
 
       {settingsOpen && (
