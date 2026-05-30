@@ -14,8 +14,8 @@
   padding-left: 27px;
 }
 
-.decayMid .title { color: var(--t2); }
-.decayHigh .title { color: var(--t3); }
+.decayMid .title { color: var(--off-white); }
+.decayHigh .title { color: var(--dim); }
 
 .main {
   display: flex;
@@ -66,38 +66,38 @@
 }
 
 .badge {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.06em;
   padding: 1px 5px;
   border-radius: var(--radius);
-  color: var(--dimmer);
-  border: 1px solid var(--border);
+  color: var(--dim);
+  border: 1px solid var(--border-bright);
 }
 .badge[data-type="revenue"] {
   color: var(--white);
-  border-color: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.3);
 }
 .badge[data-type="recurring"] {
   color: var(--dim);
 }
 .badge[data-type="sales"] {
-  color: #aaa;
+  color: #bbb;
 }
 .badge[data-type="decay"] {
-  color: #666;
+  color: var(--dim);
 }
 
 .due_overdue {
-  color: #cc4444 !important;
-  border-color: rgba(204,68,68,0.3) !important;
+  color: #e05555 !important;
+  border-color: rgba(224,85,85,0.4) !important;
 }
 .due_today {
-  color: #dddddd !important;
-  border-color: rgba(255,255,255,0.3) !important;
+  color: #eeeeee !important;
+  border-color: rgba(255,255,255,0.4) !important;
 }
 .due_soon {
-  color: #999 !important;
-  border-color: rgba(153,153,153,0.25) !important;
+  color: #aaa !important;
+  border-color: rgba(170,170,170,0.3) !important;
 }
 .due_future {
   color: var(--dimmer) !important;

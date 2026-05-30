@@ -129,7 +129,7 @@
   justify-content: center;
   gap: 2px;
   padding: 16px 4px;
-  color: var(--dimmer);
+  color: var(--dim);
   border-right: 1px solid var(--border);
   transition: color var(--transition), background var(--transition);
   position: relative;
