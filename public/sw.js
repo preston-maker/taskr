@@ -1,30 +1,24 @@
-const CACHE_NAME = 'taskr-v2'
-const STATIC_ASSETS = ['/', '/manifest.json']
+const CACHE_NAME = 'taskr-v3'
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
-  )
   self.skipWaiting()
 })
 
 self.addEventListener('activate', event => {
+  // Clear ALL old caches on activate
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
+      Promise.all(keys.map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
   )
-  self.clients.claim()
 })
 
 self.addEventListener('fetch', event => {
-  if (event.request.url.includes('/api/')) {
-    event.respondWith(fetch(event.request))
-    return
-  }
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  )
+  // Never cache - always go to network
+  // Service worker only exists for push notifications
+  event.respondWith(fetch(event.request).catch(() => {
+    return new Response('Offline', { status: 503 })
+  }))
 })
 
 // Push notification handler
