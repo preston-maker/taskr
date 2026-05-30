@@ -45,6 +45,10 @@ export default function TaskrApp() {
       fetch('/api/tasks'),
       fetch('/api/tasks/completed'),
     ])
+    if (activeRes.status === 401) {
+      window.location.href = '/login'
+      return
+    }
     const active = await activeRes.json()
     const completed = await completedRes.json()
     setTasks(Array.isArray(active) ? active : [])
