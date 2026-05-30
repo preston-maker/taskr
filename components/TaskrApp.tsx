@@ -157,7 +157,10 @@ export default function TaskrApp() {
   }))
 
   const tier1Full = (tierColumns[0]?.tasks.length ?? 0) >= 4
-  const visibleColumns = isMobile ? [tierColumns[activeMobileTier]] : tierColumns
+  const safeMobileTier = Math.min(activeMobileTier, tierColumns.length - 1)
+  const visibleColumns = isMobile
+    ? tierColumns.slice(safeMobileTier, safeMobileTier + 1)
+    : tierColumns
 
   return (
     <div className={`${styles.app} ${isMobile ? styles.appMobile : ''}`}>
@@ -182,20 +185,20 @@ export default function TaskrApp() {
       <QuickCapture onAdd={addTask} tier1Full={tier1Full} tiers={tiers} tags={tags} />
 
       <main className={styles.main} style={!isMobile ? { gridTemplateColumns: `repeat(${tierColumns.length}, 1fr)` } : undefined}>
-        {visibleColumns.filter(Boolean).map(col => (
+        {visibleColumns.map(col => (
           <TierColumn
-            key={col!.tier}
-            tier={col!.tier}
-            label={col!.label}
-            sortOrder={col!.sortOrder}
-            tasks={col!.tasks}
-            completedTasks={col!.completed}
+            key={col.tier}
+            tier={col.tier}
+            label={col.label}
+            sortOrder={col.sortOrder}
+            tasks={col.tasks}
+            completedTasks={col.completed}
             onComplete={completeTask}
             onMove={moveTask}
             onDelete={deleteTask}
             onEdit={setEditingTask}
-            onAdd={(title, tag, isRevenue) => addTask(title, col!.tier, tag, isRevenue, false)}
-            cap={col!.cap}
+            onAdd={(title, tag, isRevenue) => addTask(title, col.tier, tag, isRevenue, false)}
+            cap={col.cap}
             allTiers={tiers}
             tags={tags}
             dragId={dragId}
