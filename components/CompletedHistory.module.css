@@ -1,0 +1,147 @@
+.view {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 28px 40px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--white);
+  letter-spacing: 0.06em;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--dimmer);
+  letter-spacing: 0.04em;
+}
+
+.closeBtn {
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  margin-top: 2px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.closeBtn:hover { color: var(--white); border-color: var(--dimmer); opacity: 1; }
+
+.empty {
+  padding: 48px 40px;
+  font-size: 12px;
+  color: var(--dimmer);
+  letter-spacing: 0.04em;
+}
+
+.group {
+  max-width: 680px;
+  padding: 28px 40px 0;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.groupDay {
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.groupCount {
+  font-size: 10px;
+  color: var(--dimmer);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  transition: opacity var(--transition);
+}
+.item:last-child { border-bottom: none; }
+.itemRestored { opacity: 0.4; }
+
+.itemCheck {
+  font-size: 10px;
+  color: var(--dimmer);
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+
+.itemTitle {
+  flex: 1;
+  font-size: 13px;
+  color: var(--t2);
+  letter-spacing: 0.01em;
+  text-decoration: line-through;
+  text-decoration-color: var(--dimmer);
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.itemTag {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.itemTier {
+  font-size: 10px;
+  color: var(--dimmer);
+  letter-spacing: 0.04em;
+}
+
+.itemTime {
+  font-size: 10px;
+  color: var(--dimmer);
+}
+
+.restoreBtn {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--dimmer);
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  flex-shrink: 0;
+  transition: color var(--transition), border-color var(--transition);
+}
+.restoreBtn:hover { color: var(--white); border-color: var(--dimmer); opacity: 1; }
+
+.restoredLabel {
+  font-size: 10px;
+  color: var(--dimmer);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}

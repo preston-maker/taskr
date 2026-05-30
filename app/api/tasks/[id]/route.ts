@@ -25,6 +25,11 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       values.push(new Date().toISOString())
     }
 
+    if (body.completed === false) {
+      fields.push(`completed_at = $${i++}`)
+      values.push(null)
+    }
+
     fields.push(`updated_at = $${i++}`)
     values.push(new Date().toISOString())
 

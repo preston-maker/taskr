@@ -1,28 +1,39 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Task, Tier, Tag, CustomTier, CustomTag } from '@/lib/types'
 import TierColumn from './TierColumn'
 import QuickCapture from './QuickCapture'
 import WeeklyReview from './WeeklyReview'
 import SettingsPanel from './SettingsPanel'
+import EditModal from './EditModal'
+import CompletedHistory from './CompletedHistory'
 import styles from './TaskrApp.module.css'
 
 export default function TaskrApp() {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [completedTasks, setCompletedTasks] = useState<Task[]>([])
   const [tiers, setTiers] = useState<CustomTier[]>([])
   const [tags, setTags] = useState<CustomTag[]>([])
   const [loading, setLoading] = useState(true)
   const [reviewMode, setReviewMode] = useState(false)
+  const [historyMode, setHistoryMode] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [dragId, setDragId] = useState<string | null>(null)
   const [reviewData, setReviewData] = useState<null | {
     overdue: Task[], aging: Task[], skipped: Task[], drifted: Task[], total: number, lastReview: string | null
   }>(null)
 
   const fetchTasks = useCallback(async () => {
-    const res = await fetch('/api/tasks')
-    const data = await res.json()
-    setTasks(Array.isArray(data) ? data : [])
+    const [activeRes, completedRes] = await Promise.all([
+      fetch('/api/tasks'),
+      fetch('/api/tasks/completed'),
+    ])
+    const active = await activeRes.json()
+    const completed = await completedRes.json()
+    setTasks(Array.isArray(active) ? active : [])
+    setCompletedTasks(Array.isArray(completed) ? completed : [])
   }, [])
 
   const fetchSettings = useCallback(async () => {
@@ -47,12 +58,21 @@ export default function TaskrApp() {
   }
 
   const completeTask = async (id: string) => {
-    await fetch(`/api/tasks/${id}`, {
+    const res = await fetch(`/api/tasks/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ completed: true }),
     })
+    const updated = await res.json()
     setTasks(prev => prev.filter(t => t.id !== id))
+    if (updated.id) setCompletedTasks(prev => [updated, ...prev])
+  }
+
+  const restoreTask = async (id: string) => {
+    const task = completedTasks.find(t => t.id === id)
+    if (!task) return
+    setCompletedTasks(prev => prev.filter(t => t.id !== id))
+    setTasks(prev => [...prev, { ...task, completed: false, completed_at: undefined }])
   }
 
   const moveTask = async (id: string, newTier: Tier) => {
@@ -62,6 +82,15 @@ export default function TaskrApp() {
       body: JSON.stringify({ tier: newTier }),
     })
     setTasks(prev => prev.map(t => t.id === id ? { ...t, tier: newTier } : t))
+  }
+
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+    await fetch(`/api/tasks/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    })
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t))
   }
 
   const deleteTask = async (id: string) => {
@@ -82,6 +111,14 @@ export default function TaskrApp() {
     fetchTasks()
   }
 
+  // Drag handlers
+  const handleDragStart = (id: string) => setDragId(id)
+  const handleDragEnd = () => setDragId(null)
+  const handleDropOnTier = async (tierId: Tier) => {
+    if (dragId) await moveTask(dragId, tierId)
+    setDragId(null)
+  }
+
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -92,23 +129,27 @@ export default function TaskrApp() {
 
   if (reviewMode && reviewData) {
     return (
-      <WeeklyReview
-        data={reviewData}
-        onClose={closeReview}
-        onMove={moveTask}
-        onDelete={deleteTask}
-        onRefresh={fetchTasks}
+      <WeeklyReview data={reviewData} onClose={closeReview} onMove={moveTask} onDelete={deleteTask} onRefresh={fetchTasks} />
+    )
+  }
+
+  if (historyMode) {
+    return (
+      <CompletedHistory
+        tiers={tiers}
+        tags={tags}
+        onClose={() => setHistoryMode(false)}
+        onRestore={restoreTask}
       />
     )
   }
 
-  // Build tier columns from dynamic tiers
   const tierColumns = tiers.map(t => ({
     tier: t.id as Tier,
     label: t.label,
     sortOrder: t.sort_order,
     tasks: tasks.filter(task => task.tier === t.id),
-    isDefault: t.sort_order <= 3,
+    completed: completedTasks.filter(task => task.tier === t.id),
     cap: t.sort_order === 1 ? 4 : undefined,
   }))
 
@@ -119,9 +160,8 @@ export default function TaskrApp() {
       <header className={styles.header}>
         <div className={styles.wordmark}>taskr</div>
         <div className={styles.headerRight}>
-          <button className={styles.reviewBtn} onClick={openReview}>
-            weekly review
-          </button>
+          <button className={styles.historyBtn} onClick={() => setHistoryMode(true)}>completed</button>
+          <button className={styles.reviewBtn} onClick={openReview}>weekly review</button>
           <button className={styles.gearBtn} onClick={() => setSettingsOpen(true)} title="settings">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="7" cy="7" r="2.2"/>
@@ -141,15 +181,32 @@ export default function TaskrApp() {
             label={col.label}
             sortOrder={col.sortOrder}
             tasks={col.tasks}
+            completedTasks={col.completed}
             onComplete={completeTask}
             onMove={moveTask}
             onDelete={deleteTask}
+            onEdit={setEditingTask}
+            onAdd={(title, tag, isRevenue) => addTask(title, col.tier, tag, isRevenue, false)}
             cap={col.cap}
             allTiers={tiers}
             tags={tags}
+            dragId={dragId}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDrop={handleDropOnTier}
           />
         ))}
       </main>
+
+      {editingTask && (
+        <EditModal
+          task={editingTask}
+          tiers={tiers}
+          tags={tags}
+          onSave={updateTask}
+          onClose={() => setEditingTask(null)}
+        />
+      )}
 
       {settingsOpen && (
         <SettingsPanel

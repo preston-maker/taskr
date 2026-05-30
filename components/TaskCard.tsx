@@ -10,8 +10,11 @@ interface Props {
   onComplete: (id: string) => void
   onMove: (id: string, tier: Tier) => void
   onDelete: (id: string) => void
+  onEdit: (task: Task) => void
   allTiers: CustomTier[]
   tags: CustomTag[]
+  onDragStart: (id: string) => void
+  onDragEnd: () => void
 }
 
 function formatDue(dateStr: string): { label: string; status: 'overdue' | 'today' | 'soon' | 'future' } {
@@ -27,17 +30,14 @@ function formatDue(dateStr: string): { label: string; status: 'overdue' | 'today
   return { label: due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), status: 'future' }
 }
 
-export default function TaskCard({ task, tier, onComplete, onMove, onDelete, allTiers, tags }: Props) {
+export default function TaskCard({ task, tier, onComplete, onMove, onDelete, onEdit, allTiers, tags, onDragStart, onDragEnd }: Props) {
   const [hovering, setHovering] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  const [dragging, setDragging] = useState(false)
 
   const handleDelete = () => {
-    if (confirming) {
-      onDelete(task.id)
-    } else {
-      setConfirming(true)
-      setTimeout(() => setConfirming(false), 2500)
-    }
+    if (confirming) { onDelete(task.id) }
+    else { setConfirming(true); setTimeout(() => setConfirming(false), 2500) }
   }
 
   const moveTargets = allTiers.filter(t => t.id !== tier)
@@ -48,20 +48,22 @@ export default function TaskCard({ task, tier, onComplete, onMove, onDelete, all
 
   return (
     <div
-      className={`${styles.card} ${task.is_revenue ? styles.revenue : ''} ${decayClass} ${due?.status === 'overdue' ? styles.overdue : ''}`}
+      className={`${styles.card} ${task.is_revenue ? styles.revenue : ''} ${decayClass} ${due?.status === 'overdue' ? styles.overdue : ''} ${dragging ? styles.dragging : ''}`}
+      draggable
+      onDragStart={() => { setDragging(true); onDragStart(task.id) }}
+      onDragEnd={() => { setDragging(false); onDragEnd() }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => { setHovering(false); setConfirming(false) }}
     >
       <div className={styles.main}>
+        <button className={styles.dragHandle} title="drag to move">⠿</button>
         <button className={styles.check} onClick={() => onComplete(task.id)} title="mark complete">
           <span className={styles.checkInner} />
         </button>
         <span className={styles.title}>{task.title}</span>
         <div className={styles.badges}>
           {due && (
-            <span className={`${styles.badge} ${styles[`due_${due.status}`]}`}>
-              {due.label}
-            </span>
+            <span className={`${styles.badge} ${styles[`due_${due.status}`]}`}>{due.label}</span>
           )}
           {task.is_revenue && <span className={styles.badge} data-type="revenue">$</span>}
           {task.is_recurring && <span className={styles.badge} data-type="recurring">↻</span>}
@@ -76,6 +78,7 @@ export default function TaskCard({ task, tier, onComplete, onMove, onDelete, all
 
       {hovering && (
         <div className={styles.actions}>
+          <button className={styles.action} onClick={() => onEdit(task)}>edit</button>
           {moveTargets.map(t => (
             <button key={t.id} className={styles.action} onClick={() => onMove(task.id, t.id as Tier)}>
               →{t.label}

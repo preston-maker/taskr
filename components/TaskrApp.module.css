@@ -26,6 +26,21 @@
   gap: 24px;
 }
 
+.historyBtn {
+  color: var(--dimmer);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  transition: color var(--transition), border-color var(--transition);
+}
+.historyBtn:hover {
+  color: var(--white);
+  border-color: var(--dimmer);
+  opacity: 1;
+}
+
 .reviewBtn {
   color: var(--dim);
   font-size: 12px;

@@ -140,3 +140,19 @@
   color: var(--dim) !important;
   border-color: var(--dimmer) !important;
 }
+
+.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.dragHandle {
+  font-size: 11px;
+  color: var(--dimmer);
+  cursor: grab;
+  padding: 0 2px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color var(--transition);
+}
+.dragHandle:hover { color: var(--dim); opacity: 1; }
