@@ -59,11 +59,13 @@ function ReviewItem({
 
 export default function WeeklyReview({ data, onClose, onMove, onDelete }: Props) {
   const sections = [
-    { key: 'overdue', label: 'overdue', tasks: data.overdue, desc: 'past their due date' },
-    { key: 'aging', label: 'aging in tier 2', tasks: data.aging, desc: 'sitting too long, decay score elevated' },
-    { key: 'skipped', label: 'skipped recurrings', tasks: data.skipped, desc: 'past their recurrence window' },
-    { key: 'drifted', label: 'tier drift', tasks: data.drifted, desc: 'not touched in 7+ days' },
+    { key: 'overdue', label: 'overdue', tasks: data.overdue ?? [], desc: 'past their due date' },
+    { key: 'aging', label: 'aging tasks', tasks: data.aging ?? [], desc: 'decay score elevated' },
+    { key: 'skipped', label: 'skipped recurrings', tasks: data.skipped ?? [], desc: 'past their recurrence window' },
+    { key: 'drifted', label: 'tier drift', tasks: data.drifted ?? [], desc: 'not touched in 7+ days' },
   ]
+
+  const total = data.total ?? sections.reduce((sum, s) => sum + s.tasks.length, 0)
 
   const daysSinceReview = data.lastReview
     ? Math.round((Date.now() - new Date(data.lastReview).getTime()) / 86400000)
@@ -75,7 +77,7 @@ export default function WeeklyReview({ data, onClose, onMove, onDelete }: Props)
         <div className={styles.headerLeft}>
           <span className={styles.title}>weekly review</span>
           <span className={styles.subtitle}>
-            {data.total} item{data.total !== 1 ? 's' : ''} need attention
+            {total} item{total !== 1 ? 's' : ''} need attention
             {daysSinceReview !== null && ` · last review ${daysSinceReview}d ago`}
             {data.lastReview && ` (${formatDate(data.lastReview)})`}
           </span>
@@ -85,7 +87,7 @@ export default function WeeklyReview({ data, onClose, onMove, onDelete }: Props)
         </button>
       </div>
 
-      {data.total === 0 ? (
+      {total === 0 ? (
         <div className={styles.clean}>
           <span className={styles.cleanIcon}>✓</span>
           <span className={styles.cleanText}>all clear. pipeline is healthy.</span>
