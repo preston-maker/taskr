@@ -24,7 +24,7 @@ function timeAgo(dateStr: string) {
 export default function CompletedHistory({ tiers, tags, onClose, onRestore }: Props) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
-  const [restoredIds, setRestoredIds] = useState<Set<string>>(new Set())
+  const [restoredIds, setRestoredIds] = useState<string[]>([])
 
   useEffect(() => {
     fetch('/api/tasks/completed')
@@ -38,7 +38,7 @@ export default function CompletedHistory({ tiers, tags, onClose, onRestore }: Pr
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ completed: false }),
     })
-    setRestoredIds(prev => new Set([...prev, task.id]))
+    setRestoredIds(prev => [...prev, task.id])
     onRestore(task.id)
   }
 
@@ -76,7 +76,7 @@ export default function CompletedHistory({ tiers, tags, onClose, onRestore }: Pr
             <span className={styles.groupCount}>{dayTasks.length}</span>
           </div>
           {dayTasks.map(task => {
-            const restored = restoredIds.has(task.id)
+            const restored = restoredIds.includes(task.id)
             return (
               <div key={task.id} className={`${styles.item} ${restored ? styles.itemRestored : ''}`}>
                 <span className={styles.itemCheck}>✓</span>
