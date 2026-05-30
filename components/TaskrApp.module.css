@@ -184,3 +184,30 @@
     border-top: none;
   }
 }
+
+.avatarBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color var(--transition);
+  padding: 0;
+}
+.avatarBtn:hover { border-color: var(--dimmer); opacity: 1; }
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarInitial {
+  font-size: 11px;
+  color: var(--dim);
+  font-family: var(--font-mono);
+}

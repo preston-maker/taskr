@@ -16,6 +16,15 @@ export async function query(text: string, params?: unknown[]) {
 
 export async function initDB() {
   await query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email TEXT UNIQUE NOT NULL,
+      name TEXT,
+      avatar TEXT,
+      last_login TIMESTAMPTZ DEFAULT NOW(),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS tasks (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       title TEXT NOT NULL,
@@ -30,6 +39,7 @@ export async function initDB() {
       decay_score INTEGER DEFAULT 0,
       sort_order INTEGER DEFAULT 0,
       due_date DATE,
+      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
       completed BOOLEAN DEFAULT FALSE,
       completed_at TIMESTAMPTZ,
       created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -52,11 +62,13 @@ export async function initDB() {
 
     CREATE TABLE IF NOT EXISTS review_sessions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
       completed_at TIMESTAMPTZ DEFAULT NOW(),
       tasks_reviewed INTEGER DEFAULT 0
     );
 
     ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE;
+    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE CASCADE;
 
     UPDATE custom_tiers SET label = 'later' WHERE label = 'backlog' AND sort_order = 3;
 

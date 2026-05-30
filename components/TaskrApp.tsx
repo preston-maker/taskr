@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import { Task, Tier, Tag, CustomTier, CustomTag } from '@/lib/types'
 import TierColumn from './TierColumn'
 import QuickCapture from './QuickCapture'
@@ -37,6 +38,7 @@ export default function TaskrApp() {
     overdue: Task[], aging: Task[], skipped: Task[], drifted: Task[], total: number, lastReview: string | null
   }>(null)
   const isMobile = useIsMobile()
+  const { data: session } = useSession()
 
   const fetchTasks = useCallback(async () => {
     const [activeRes, completedRes] = await Promise.all([
@@ -179,6 +181,14 @@ export default function TaskrApp() {
               <path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.93 2.93l1.06 1.06M10.01 10.01l1.06 1.06M2.93 11.07l1.06-1.06M10.01 3.99l1.06-1.06"/>
             </svg>
           </button>
+          {session?.user && (
+            <button className={styles.avatarBtn} onClick={() => signOut({ callbackUrl: '/login' })} title="sign out">
+              {session.user.image
+                ? <img src={session.user.image} alt="" className={styles.avatarImg} />
+                : <span className={styles.avatarInitial}>{session.user.name?.[0] ?? '?'}</span>
+              }
+            </button>
+          )}
         </div>
       </header>
 

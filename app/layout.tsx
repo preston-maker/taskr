@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import SessionWrapper from '@/components/SessionWrapper'
 
 export const metadata: Metadata = {
   title: 'taskr',
@@ -10,8 +11,6 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'taskr',
   },
-  themeColor: '#000000',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   icons: {
     icon: [
       { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
@@ -25,15 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        {children}
+        <SessionWrapper>
+          {children}
+        </SessionWrapper>
         <script dangerouslySetInnerHTML={{
-          __html: `
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-              })
-            }
-          `
+          __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js') }) }`
         }} />
       </body>
     </html>
