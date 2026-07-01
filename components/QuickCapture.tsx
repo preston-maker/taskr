@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Tier, Tag, CustomTier, CustomTag } from '@/lib/types'
 import styles from './QuickCapture.module.css'
 
@@ -14,13 +14,25 @@ interface Props {
 export default function QuickCapture({ onAdd, tier1Full, tiers, tags }: Props) {
   const [value, setValue] = useState('')
   const [expanded, setExpanded] = useState(false)
-  const [tierId, setTierId] = useState<number>(tiers[1]?.id ?? 2)
-  const [tag, setTag] = useState<Tag>(tags[1]?.label ?? 'admin')
+  const [tierId, setTierId] = useState<number>(tiers[1]?.id ?? tiers[0]?.id ?? 2)
+  const [tag, setTag] = useState<Tag>(tags[1]?.label ?? tags[0]?.label ?? 'admin')
   const [isRevenue, setIsRevenue] = useState(false)
   const [isRecurring, setIsRecurring] = useState(false)
   const [recurDays, setRecurDays] = useState(7)
   const [dueDate, setDueDate] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Keep defaults valid once tiers/tags load asynchronously
+  useEffect(() => {
+    if (tiers.length && !tiers.some(t => t.id === tierId)) {
+      setTierId(tiers[1]?.id ?? tiers[0].id)
+    }
+  }, [tiers, tierId])
+  useEffect(() => {
+    if (tags.length && !tags.some(t => t.label === tag)) {
+      setTag(tags[1]?.label ?? tags[0].label)
+    }
+  }, [tags, tag])
 
   const tier1Id = tiers[0]?.id
 

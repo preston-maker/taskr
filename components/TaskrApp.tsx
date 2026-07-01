@@ -94,7 +94,7 @@ export default function TaskrApp() {
   // Fire notification for due/overdue tasks once loaded
   useEffect(() => {
     if (!tasks.length) return
-    if (typeof window === 'undefined' || Notification.permission !== 'granted') return
+    if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') return
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const due = tasks.filter(t => {
@@ -326,7 +326,7 @@ export default function TaskrApp() {
           tags={tags}
           onClose={() => setSettingsOpen(false)}
           onTierAdded={tier => setTiers(prev => [...prev, tier])}
-          onTierDeleted={id => setTiers(prev => prev.filter(t => t.id !== id))}
+          onTierDeleted={id => { setTiers(prev => prev.filter(t => t.id !== id)); fetchTasks() }}
           onTierUpdated={tier => setTiers(prev => prev.map(t => t.id === tier.id ? tier : t))}
           onTagAdded={tag => setTags(prev => [...prev, tag])}
           onTagDeleted={id => setTags(prev => prev.filter(t => t.id !== id))}
