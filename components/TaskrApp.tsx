@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { Task, Tier, Tag, CustomTier, CustomTag } from '@/lib/types'
 import TierColumn from './TierColumn'
@@ -36,6 +36,29 @@ export default function TaskrApp() {
   const [dragId, setDragId] = useState<string | null>(null)
   const [activeMobileTier, setActiveMobileTier] = useState(0)
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
+  const touchStart = useRef({ x: 0, y: 0 })
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isMobile) return
+    const dx = e.changedTouches[0].clientX - touchStart.current.x
+    const dy = e.changedTouches[0].clientY - touchStart.current.y
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return
+    if (dx < 0 && activeMobileTier < tiers.length - 1) setActiveMobileTier(activeMobileTier + 1)
+    if (dx > 0 && activeMobileTier > 0) setActiveMobileTier(activeMobileTier - 1)
+  }
+
+  const handleEmptyTap = (e: React.MouseEvent) => {
+    if (!isMobile) return
+    const target = e.target as HTMLElement
+    // Only trigger when tapping true empty space, not tasks/buttons/inputs
+    if (target.closest('button, input, textarea, select, a, [draggable="true"]')) return
+    const el = document.getElementById('quick-capture-input') as HTMLInputElement | null
+    el?.focus()
+  }
   const [reviewData, setReviewData] = useState<null | {
     overdue: Task[], aging: Task[], skipped: Task[], drifted: Task[], total: number, lastReview: string | null
   }>(null)
@@ -241,7 +264,13 @@ export default function TaskrApp() {
 
       <QuickCapture onAdd={addTask} tier1Full={tier1Full} tiers={tiers} tags={tags} />
 
-      <main className={styles.main} style={!isMobile ? { gridTemplateColumns: `repeat(${tierColumns.length}, 1fr)` } : undefined}>
+      <main
+        className={styles.main}
+        style={!isMobile ? { gridTemplateColumns: `repeat(${tierColumns.length}, 1fr)` } : undefined}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onClick={handleEmptyTap}
+      >
         {visibleColumns.map(col => (
           <TierColumn
             key={col.tier}

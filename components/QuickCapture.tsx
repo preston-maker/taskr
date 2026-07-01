@@ -47,6 +47,7 @@ export default function QuickCapture({ onAdd, tier1Full, tiers, tags }: Props) {
         <span className={styles.prompt}>+</span>
         <input
           ref={inputRef}
+          id="quick-capture-input"
           className={styles.input}
           placeholder="capture a task..."
           value={value}
